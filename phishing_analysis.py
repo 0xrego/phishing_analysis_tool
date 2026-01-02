@@ -89,11 +89,16 @@ if ips and len(set(ips)) == 1:
 else:
     print("IPs inválidos ou inconsistentes")
 
-def check_ip_vt(x) -> None:
+def check_ip_vt(ip:str) -> None:
+    """Contacts the VirusTotal API and searches to security vendors flags on the IP
+
+    Args:
+        ip (str): IP Address 
+    """
     api_key = os.getenv("VT_API_KEY")
     if not api_key:
         print("VARIAVEL NÃO DEFINIDA (VT_API_KEY)")
-    url = f"https://www.virustotal.com/api/v3/ip_addresses/{x}"
+    url = f"https://www.virustotal.com/api/v3/ip_addresses/{ip}"
 
     headers = {
                 "accept": "application/json",
@@ -109,7 +114,7 @@ def check_ip_vt(x) -> None:
     undetected = stats.get("undetected", 0)
     total = malicious + suspicious + harmless + undetected
 
-    print(f'The IP Address \"{x}\" as score of {malicious}/{total} in VirusTotal\n')
+    print(f'The IP Address \"{ip}\" as score of {malicious}/{total} in VirusTotal\n')
 
 check_ip_vt(clean_ip)
 
@@ -122,11 +127,16 @@ for h in domain_headers:
     matches = re.findall(r'\b[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b', value)
     domains.extend(matches)
 
-def check_domain_vt(x) -> None:
+def check_domain_vt(domain:str) -> None:
+    """Contacts the VirusTotal API and searches to security vendors flags on the Domain
+
+    Args:
+        domain (str): Domain Addresses present in the SMTP header of the email 
+    """
     api_key = os.getenv("VT_API_KEY")
     if not api_key:
         print("VARIAVEL NÃO DEFINIDA (VT_API_KEY)")
-    url = f"https://www.virustotal.com/api/v3/domains/{x}"
+    url = f"https://www.virustotal.com/api/v3/domains/{domain}"
 
     headers = {
                 "accept": "application/json",
@@ -142,7 +152,7 @@ def check_domain_vt(x) -> None:
     undetected = stats.get("undetected", 0)
     total = malicious + suspicious + harmless + undetected
 
-    print(f'The Domain Address \"{x}\" as score of {malicious}/{total} in VirusTotal\n')
+    print(f'The Domain Address \"{domain}\" as score of {malicious}/{total} in VirusTotal\n')
 
 domain_headers = ["from", "reply-to", "return-path"]
 domains = []
@@ -158,7 +168,12 @@ for header, domain in domains:
     print(f"[{header.upper()}] Domain found: {domain}")
     check_domain_vt(domain)  
 
-def check_ip_abuse(x) -> None:
+def check_ip_abuse(ip:str) -> None:
+    """Contacts the AbuseIPDB API and access the Confidence of Abuse score of the IP
+
+    Args:
+        ip (str): IP Address
+    """
     api_key= os.getenv("ABUSE_API_KEY")
     if not api_key:
         print("VARIABLE NOT DEFINED (ABUSE_API_KEY)")
@@ -166,7 +181,7 @@ def check_ip_abuse(x) -> None:
     url = f'https://api.abuseipdb.com/api/v2/check'
 
     querystring = {
-    'ipAddress': x,
+    'ipAddress': ip,
     'maxAgeInDays': '90'
     }
     headers = {
@@ -177,6 +192,6 @@ def check_ip_abuse(x) -> None:
     response_json = json.loads(response.text)
     stats = response_json['data']
     abuseScore = stats.get('abuseConfidenceScore', 0)
-    print(f'The IP Address \"{x}\" as {abuseScore}% Confidence of Abuse in AbuseIPDB\n')
+    print(f'The IP Address \"{ip}\" as {abuseScore}% Confidence of Abuse in AbuseIPDB\n')
 
 check_ip_abuse(clean_ip)

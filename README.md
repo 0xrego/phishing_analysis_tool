@@ -17,7 +17,7 @@
 ## Output 
 
 ### A full report of a phishing email with:
-    - spf and dkim
+    - SPF and DKIM
     - IP Address score of all security vendors in VirusTotal.
     - IP Address Confidence of Abuse score in AbuseIPDB.
     - A score for every domain present in the headers.
